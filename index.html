@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>言語アンケート</title>
+<style>
+  body {
+    background: #c9dcf0 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="%23c9dcf0"/><rect width="2" height="2" fill="%23bcd2ec"/></svg>');
+    font-family: Verdana, Arial, "Noto Sans", "MS PGothic", sans-serif;
+    margin: 0;
+    padding: 20px;
+    color: #222;
+  }
+
+  #wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 2px solid #5b85b7;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.25);
+  }
+
+  #header {
+    background: linear-gradient(to bottom, #7ea7d8 0%, #4d76ad 50%, #3a5f93 100%);
+    border-bottom: 2px solid #2c4a73;
+    border-radius: 6px 6px 0 0;
+    padding: 14px 18px 40px;
+    color: #ffffff;
+    position: relative;
+  }
+
+  #header h1 {
+    margin: 0;
+    font-size: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    letter-spacing: 0.5px;
+  }
+
+  #header p.sub {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: #dce8f7;
+  }
+
+  /* サイト表示言語の切替（プルダウン形式：12言語対応のため） */
+  #ui-lang-switch {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 11px;
+  }
+
+  #ui-lang-switch select {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 11px;
+    background: #ffffff;
+    color: #2c4a73;
+    border: 1px solid #2c4a73;
+    border-radius: 3px;
+    padding: 3px 4px;
+    cursor: pointer;
+  }
+
+  #ui-lang-note {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 10px;
+    color: #dce8f7;
+  }
+
+  #notice {
+    background: #fffbe0;
+    border: 1px solid #e0d28a;
+    margin: 14px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.6;
+    border-radius: 4px;
+    color: #5a4d10;
+  }
+
+  #notice strong {
+    color: #a35d00;
+  }
+
+  #content {
+    padding: 6px 18px 20px;
+  }
+
+  #question {
+    background: #eef4fb;
+    border: 1px dashed #9bb8d9;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2c4a73;
+  }
+
+  #detect-info {
+    font-size: 11px;
+    color: #666;
+    margin: 0 0 10px 2px;
+  }
+
+  #lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 420px) {
+    #lang-grid { grid-template-columns: 1fr; }
+  }
+
+  .lang-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, #ffffff 0%, #e8eef7 100%);
+    border: 1px solid #a9bfdd;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #243a5e;
+    text-align: left;
+  }
+
+  .lang-btn:hover {
+    background: linear-gradient(to bottom, #ffffff 0%, #d2e2f7 100%);
+    border-color: #5b85b7;
+  }
+
+  .lang-btn:active {
+    background: #c3d8ef;
+  }
+
+  .lang-btn .native {
+    font-weight: bold;
+  }
+
+  .lang-btn .code {
+    font-size: 10px;
+    color: #7a8aa3;
+    background: #f0f3f8;
+    border: 1px solid #d3ddec;
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 6px;
+  }
+
+  .lang-btn.recommended {
+    border: 2px solid #ffb030;
+    background: linear-gradient(to bottom, #fff7e6 0%, #ffe9c2 100%);
+  }
+
+  .lang-btn.recommended .badge {
+    font-size: 9px;
+    color: #ffffff;
+    background: #ff8c1a;
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-left: 4px;
+  }
+
+  #manual-toggle {
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  #manual-toggle a {
+    color: #2255aa;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  #thanks {
+    display: none;
+    background: #e9f7e2;
+    border: 1px solid #9cce8a;
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #335c22;
+  }
+
+  #thanks .big {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  #footer {
+    text-align: center;
+    font-size: 10px;
+    color: #8094ad;
+    padding: 10px;
+    border-top: 1px dotted #c3d2e6;
+  }
+
+  .blink {
+    animation: blink 1.2s steps(2, start) infinite;
+  }
+  @keyframes blink {
+    to { visibility: hidden; }
+  }
+
+  #status-line {
+    font-size: 11px;
+    text-align: center;
+    color: #999;
+    margin-top: 8px;
+    min-height: 14px;
+  }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <div id="header">
+    <div id="ui-lang-switch">
+      <select id="ui-lang-select"></select>
+    </div>
+    <h1 id="t-title">★ 言語アンケートフォーム ★</h1>
+    <p class="sub" id="t-subtitle">- 訪問者の皆様にご協力をお願いしております -</p>
+    <div id="ui-lang-note" class="ui-lang-note"><span id="t-autonote">表示言語はブラウザ設定から自動選択 / 変更可</span></div>
+  </div>
+
+  <div id="notice">
+    <span id="t-notice">アンケートフォームにアクセス頂いてありがとうございます。<br>あなたが読むのに使う言語を1つお選びください。集計結果はサイト改善に利用させていただきます。</span>
+  </div>
+
+  <div id="content">
+    <div id="question"><span id="t-question">Q. あなたが読むのに使う言語は何ですか？</span></div>
+    <div id="detect-info"><span id="t-detect">※ お使いのブラウザの設定から、推奨候補に</span> <span style="color:#ff8c1a;">★</span> <span id="t-detect2">マークをつけています</span></div>
+
+    <div id="lang-grid"></div>
+
+    <div id="manual-toggle">
+      <a id="show-all-link">＞＞ <span id="t-showmore">もっと言語を表示する</span>（<span id="t-allcount">全</span><span id="total-count">0</span><span id="t-langunit">言語</span>）</a>
+    </div>
+
+    <div id="status-line"></div>
+
+    <div id="thanks">
+      <div class="big">(^_^)/</div>
+      <span id="t-thanks1">ご回答ありがとうございました！</span><br>
+      <span id="thanks-lang"></span><span id="t-thanks2"> として記録しました。</span>
+    </div>
+  </div>
+
+  <div id="footer">
+    <span id="t-copyright">Copyright (C) 言語アンケートフォーム All Rights Reserved.</span><br>
+    <span class="blink">just now visiting...</span>
+  </div>
+</div>
+
+<script>
+  // アンケート回答の選択肢: 表示順は固定（英語→日本語→ポルトガル語系→東南アジア→その他）
+  const LANGS = [
+    { native: "English", en: "English", code: "en" },
+    { native: "日本語", en: "Japanese", code: "ja" },
+    { native: "Português", en: "Portuguese", code: "pt" },
+    { native: "Português (Brasil)", en: "Portuguese (Brazil)", code: "pt-br" },
+    { native: "Tiếng Việt", en: "Vietnamese", code: "vi" },
+    { native: "ไทย", en: "Thai", code: "th" },
+    { native: "Bahasa Indonesia", en: "Indonesian", code: "id" },
+    { native: "Bahasa Melayu", en: "Malay", code: "ms" },
+    { native: "Filipino", en: "Filipino", code: "tl" },
+    { native: "ភាសាខ្មែរ", en: "Khmer", code: "km" },
+    { native: "မြန်မာဘာသာ", en: "Burmese", code: "my" },
+    { native: "ລາວ", en: "Lao", code: "lo" },
+    { native: "中文", en: "Chinese", code: "zh" },
+    { native: "한국어", en: "Korean", code: "ko" },
+    { native: "Español", en: "Spanish", code: "es" },
+    { native: "Français", en: "French", code: "fr" },
+    { native: "Deutsch", en: "German", code: "de" },
+    { native: "Italiano", en: "Italian", code: "it" },
+    { native: "Русский", en: "Russian", code: "ru" },
+    { native: "العربية", en: "Arabic", code: "ar" },
+    { native: "हिन्दी", en: "Hindi", code: "hi" },
+    { native: "Türkçe", en: "Turkish", code: "tr" },
+    { native: "Polski", en: "Polish", code: "pl" },
+    { native: "Nederlands", en: "Dutch", code: "nl" },
+    { native: "Svenska", en: "Swedish", code: "sv" },
+    { native: "Ελληνικά", en: "Greek", code: "el" },
+    { native: "עברית", en: "Hebrew", code: "he" },
+    { native: "Українська", en: "Ukrainian", code: "uk" },
+    { native: "Čeština", en: "Czech", code: "cs" },
+    { native: "Magyar", en: "Hungarian", code: "hu" },
+    { native: "Suomi", en: "Finnish", code: "fi" }
+  ];
+
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1501538530218868886/QVTjScvrZIQt9Q8h9F4y2wA5rSUihHCSyYvim57To_Zo9DiT0A3LYjRKqwTDin7k0sHb";
+
+  // --- サイト表示言語(UI言語) 12言語対応 ---
+  // 自動判定はIPを使わず、ブラウザの navigator.language(s) のみを使用する。
+  const UI_TEXT = {
+    en: {
+      label: "English",
+      title: "★ Language Survey Form ★",
+      subtitle: "- We appreciate your participation -",
+      autonote: "Display language auto-selected from your browser / changeable anytime",
+      notice: "Thank you for visiting this survey form.<br>Please select the one language you use to read. Results will be used to improve the site.",
+      question: "Q. What language do you use to read?",
+      detect: "※ Based on your browser settings, we marked our suggestion with",
+      detect2: "",
+      showmore: "Show more languages",
+      showless: "Show fewer languages",
+      allcount: "",
+      langunit: " languages total",
+      thanks1: "Thank you for your response!",
+      thanks2: " has been recorded.",
+      copyright: "Copyright (C) Language Survey Form. All Rights Reserved.",
+      recommended: "★ Suggested",
+      sending: "Sending..."
+    },
+    ja: {
+      label: "日本語",
+      title: "★ 言語アンケートフォーム ★",
+      subtitle: "- 訪問者の皆様にご協力をお願いしております -",
+      autonote: "表示言語はブラウザ設定から自動選択／いつでも変更できます",
+      notice: "アンケートフォームにアクセス頂いてありがとうございます。<br>あなたが読むのに使う言語を1つお選びください。集計結果はサイト改善に利用させていただきます。",
+      question: "Q. あなたが読むのに使う言語は何ですか？",
+      detect: "※ お使いのブラウザの設定から、推奨候補に",
+      detect2: "マークをつけています",
+      showmore: "もっと言語を表示する",
+      showless: "候補を少なく表示する",
+      allcount: "全",
+      langunit: "言語",
+      thanks1: "ご回答ありがとうございました！",
+      thanks2: " として記録しました。",
+      copyright: "Copyright (C) 言語アンケートフォーム All Rights Reserved.",
+      recommended: "★おすすめ",
+      sending: "送信中..."
+    },
+    pt: {
+      label: "Português",
+      title: "★ Formulário de Pesquisa de Idioma ★",
+      subtitle: "- Agradecemos sua participação -",
+      autonote: "Idioma de exibição selecionado automaticamente pelo navegador / pode ser alterado a qualquer momento",
+      notice: "Obrigado por visitar este formulário de pesquisa.<br>Selecione o idioma que você usa para ler. Os resultados serão usados para melhorar o site.",
+      question: "P. Qual idioma você usa para ler?",
+      detect: "※ Com base nas configurações do seu navegador, marcamos nossa sugestão com",
+      detect2: "",
+      showmore: "Mostrar mais idiomas",
+      showless: "Mostrar menos idiomas",
+      allcount: "Total de ",
+      langunit: " idiomas",
+      thanks1: "Obrigado pela sua resposta!",
+      thanks2: " foi registrado.",
+      copyright: "Copyright (C) Formulário de Pesquisa de Idioma. Todos os direitos reservados.",
+      recommended: "★ Sugestão",
+      sending: "Enviando..."
+    },
+    vi: {
+      label: "Tiếng Việt",
+      title: "★ Phiếu Khảo Sát Ngôn Ngữ ★",
+      subtitle: "- Cảm ơn bạn đã tham gia -",
+      autonote: "Ngôn ngữ hiển thị được chọn tự động theo trình duyệt / có thể thay đổi bất cứ lúc nào",
+      notice: "Cảm ơn bạn đã truy cập phiếu khảo sát này.<br>Vui lòng chọn một ngôn ngữ bạn dùng để đọc. Kết quả sẽ được dùng để cải thiện trang web.",
+      question: "Hỏi: Bạn dùng ngôn ngữ nào để đọc?",
+      detect: "※ Dựa trên cài đặt trình duyệt của bạn, chúng tôi đánh dấu gợi ý bằng",
+      detect2: "",
+      showmore: "Hiện thêm ngôn ngữ",
+      showless: "Hiện ít ngôn ngữ hơn",
+      allcount: "Tổng ",
+      langunit: " ngôn ngữ",
+      thanks1: "Cảm ơn câu trả lời của bạn!",
+      thanks2: " đã được ghi nhận.",
+      copyright: "Copyright (C) Phiếu Khảo Sát Ngôn Ngữ. Đã đăng ký bản quyền.",
+      recommended: "★ Gợi ý",
+      sending: "Đang gửi..."
+    },
+    th: {
+      label: "ไทย",
+      title: "★ แบบสำรวจภาษา ★",
+      subtitle: "- ขอบคุณที่เข้าร่วม -",
+      autonote: "ภาษาที่แสดงเลือกอัตโนมัติจากเบราว์เซอร์ / เปลี่ยนได้ทุกเมื่อ",
+      notice: "ขอบคุณที่เข้าชมแบบสำรวจนี้<br>กรุณาเลือกภาษาที่คุณใช้อ่าน ผลลัพธ์จะถูกใช้เพื่อปรับปรุงเว็บไซต์",
+      question: "ถาม: คุณใช้ภาษาอะไรในการอ่าน?",
+      detect: "※ จากการตั้งค่าเบราว์เซอร์ของคุณ เราทำเครื่องหมายคำแนะนำด้วย",
+      detect2: "",
+      showmore: "แสดงภาษาเพิ่มเติม",
+      showless: "แสดงภาษาน้อยลง",
+      allcount: "รวม ",
+      langunit: " ภาษา",
+      thanks1: "ขอบคุณสำหรับคำตอบของคุณ!",
+      thanks2: " ได้รับการบันทึกแล้ว",
+      copyright: "Copyright (C) แบบสำรวจภาษา สงวนลิขสิทธิ์",
+      recommended: "★ คำแนะนำ",
+      sending: "กำลังส่ง..."
+    },
+    id: {
+      label: "Bahasa Indonesia",
+      title: "★ Formulir Survei Bahasa ★",
+      subtitle: "- Terima kasih atas partisipasi Anda -",
+      autonote: "Bahasa tampilan dipilih otomatis dari browser / dapat diubah kapan saja",
+      notice: "Terima kasih telah mengunjungi formulir survei ini.<br>Silakan pilih satu bahasa yang Anda gunakan untuk membaca. Hasilnya akan digunakan untuk meningkatkan situs ini.",
+      question: "T. Bahasa apa yang Anda gunakan untuk membaca?",
+      detect: "※ Berdasarkan pengaturan browser Anda, kami menandai saran kami dengan",
+      detect2: "",
+      showmore: "Tampilkan lebih banyak bahasa",
+      showless: "Tampilkan lebih sedikit bahasa",
+      allcount: "Total ",
+      langunit: " bahasa",
+      thanks1: "Terima kasih atas tanggapan Anda!",
+      thanks2: " telah dicatat.",
+      copyright: "Copyright (C) Formulir Survei Bahasa. Semua Hak Dilindungi.",
+      recommended: "★ Disarankan",
+      sending: "Mengirim..."
+    },
+    ms: {
+      label: "Bahasa Melayu",
+      title: "★ Borang Soal Selidik Bahasa ★",
+      subtitle: "- Terima kasih atas penyertaan anda -",
+      autonote: "Bahasa paparan dipilih secara automatik daripada pelayar / boleh ditukar pada bila-bila masa",
+      notice: "Terima kasih kerana melawat borang soal selidik ini.<br>Sila pilih satu bahasa yang anda gunakan untuk membaca. Keputusan akan digunakan untuk menambah baik laman web.",
+      question: "S. Bahasa apa yang anda gunakan untuk membaca?",
+      detect: "※ Berdasarkan tetapan pelayar anda, kami menandakan cadangan kami dengan",
+      detect2: "",
+      showmore: "Tunjukkan lebih banyak bahasa",
+      showless: "Tunjukkan kurang bahasa",
+      allcount: "Jumlah ",
+      langunit: " bahasa",
+      thanks1: "Terima kasih atas respons anda!",
+      thanks2: " telah direkodkan.",
+      copyright: "Copyright (C) Borang Soal Selidik Bahasa. Hak Cipta Terpelihara.",
+      recommended: "★ Cadangan",
+      sending: "Menghantar..."
+    },
+    tl: {
+      label: "Filipino",
+      title: "★ Survey Form ng Wika ★",
+      subtitle: "- Salamat sa iyong pakikilahok -",
+      autonote: "Awtomatikong napili ang wika ng pagpapakita mula sa browser / maaaring baguhin anumang oras",
+      notice: "Salamat sa pagbisita sa survey form na ito.<br>Mangyaring pumili ng isang wikang ginagamit mo sa pagbabasa. Gagamitin ang mga resulta upang mapahusay ang site.",
+      question: "T. Anong wika ang gamit mo sa pagbabasa?",
+      detect: "※ Batay sa setting ng iyong browser, minarkahan namin ang aming mungkahi gamit ang",
+      detect2: "",
+      showmore: "Ipakita ang higit pang wika",
+      showless: "Ipakita ang mas kaunting wika",
+      allcount: "Kabuuang ",
+      langunit: " wika",
+      thanks1: "Salamat sa iyong sagot!",
+      thanks2: " ay naitala na.",
+      copyright: "Copyright (C) Survey Form ng Wika. Nakalaan ang Lahat ng Karapatan.",
+      recommended: "★ Mungkahi",
+      sending: "Ipinapadala..."
+    },
+    km: {
+      label: "ភាសាខ្មែរ",
+      title: "★ ទម្រង់ស្ទង់មតិភាសា ★",
+      subtitle: "- សូមអរគុណចំពោះការចូលរួមរបស់អ្នក -",
+      autonote: "ភាសាបង្ហាញត្រូវបានជ្រើសរើសដោយស្វ័យប្រវត្តិពីកម្មវិធីរុករក / អាចផ្លាស់ប្តូរបានគ្រប់ពេល",
+      notice: "សូមអរគុណចំពោះការចូលមើលទម្រង់ស្ទង់មតិនេះ។<br>សូមជ្រើសរើសភាសាមួយដែលអ្នកប្រើដើម្បីអាន។ លទ្ធផលនឹងត្រូវប្រើដើម្បីលើកកម្ពស់គេហទំព័រ។",
+      question: "សួរ៖ អ្នកប្រើភាសាអ្វីដើម្បីអាន?",
+      detect: "※ ផ្អែកលើការកំណត់កម្មវិធីរុករករបស់អ្នក យើងបានសម្គាល់ការផ្តល់យោបល់របស់យើងជាមួយ",
+      detect2: "",
+      showmore: "បង្ហាញភាសាបន្ថែម",
+      showless: "បង្ហាញភាសាតិចជាង",
+      allcount: "សរុប ",
+      langunit: " ភាសា",
+      thanks1: "សូមអរគុណចំពោះចម្លើយរបស់អ្នក!",
+      thanks2: " ត្រូវបានកត់ត្រា។",
+      copyright: "Copyright (C) ទម្រង់ស្ទង់មតិភាសា។ រក្សាសិទ្ធិគ្រប់យ៉ាង។",
+      recommended: "★ ការផ្តល់យោបល់",
+      sending: "កំពុងផ្ញើ..."
+    },
+    my: {
+      label: "မြန်မာဘာသာ",
+      title: "★ ဘာသာစကား စစ်တမ်းပုံစံ ★",
+      subtitle: "- ပါဝင်ဆောင်ရွက်မှုအတွက် ကျေးဇူးတင်ပါသည် -",
+      autonote: "ပြသမည့်ဘာသာစကားကို browser မှ အလိုအလျောက်ရွေးချယ်ပြီး / အချိန်မရွေး ပြောင်းနိုင်သည်",
+      notice: "ဤစစ်တမ်းပုံစံကို လည်ပတ်ကြည့်ရှုပေးသည့်အတွက် ကျေးဇူးတင်ပါသည်။<br>သင်ဖတ်ရန်အသုံးပြုသော ဘာသာစကားတစ်ခုကို ရွေးချယ်ပါ။ ရလဒ်များကို ဝက်ဘ်ဆိုက် တိုးတက်စေရန် အသုံးပြုပါမည်။",
+      question: "မေး: သင်ဖတ်ရန် မည်သည့်ဘာသာစကားကို အသုံးပြုပါသနည်း?",
+      detect: "※ သင့် browser ဆက်တင်များအပေါ် မူတည်၍ ကျွန်ုပ်တို့၏ အကြံပြုချက်ကို",
+      detect2: "ဖြင့် မှတ်သားထားပါသည်",
+      showmore: "ဘာသာစကား ပိုမိုပြပါ",
+      showless: "ဘာသာစကား နည်းနည်းပြပါ",
+      allcount: "စုစုပေါင်း ",
+      langunit: " ဘာသာစကား",
+      thanks1: "သင့်အကြောင်းပြန်ချက်အတွက် ကျေးဇူးတင်ပါသည်!",
+      thanks2: " ကို မှတ်တမ်းတင်ထားပါသည်။",
+      copyright: "Copyright (C) ဘာသာစကား စစ်တမ်းပုံစံ။ မူပိုင်ခွင့်အားလုံး လက်ဝယ်ရှိသည်။",
+      recommended: "★ အကြံပြုချက်",
+      sending: "ပေးပို့နေသည်..."
+    },
+    lo: {
+      label: "ລາວ",
+      title: "★ ແບບສຳຫຼວດພາສາ ★",
+      subtitle: "- ຂອບໃຈສຳລັບການເຂົ້າຮ່ວມຂອງທ່ານ -",
+      autonote: "ພາສາສະແດງຖືກເລືອກອັດຕະໂນມັດຈາກບຣາວເຊີ / ສາມາດປ່ຽນໄດ້ທຸກເວລາ",
+      notice: "ຂອບໃຈທີ່ເຂົ້າມາຢ້ຽມຊົມແບບສຳຫຼວດນີ້.<br>ກະລຸນາເລືອກພາສາໜຶ່ງທີ່ທ່ານໃຊ້ອ່ານ. ຜົນລັບຈະຖືກນຳໃຊ້ເພື່ອປັບປຸງເວັບໄຊທ໌.",
+      question: "ຖາມ: ທ່ານໃຊ້ພາສາໃດໃນການອ່ານ?",
+      detect: "※ ອີງຕາມການຕັ້ງຄ່າບຣາວເຊີຂອງທ່ານ, ພວກເຮົາໄດ້ໝາຍຄຳແນະນຳຂອງພວກເຮົາດ້ວຍ",
+      detect2: "",
+      showmore: "ສະແດງພາສາເພີ່ມເຕີມ",
+      showless: "ສະແດງພາສານ້ອຍລົງ",
+      allcount: "ທັງໝົດ ",
+      langunit: " ພາສາ",
+      thanks1: "ຂອບໃຈສຳລັບຄຳຕອບຂອງທ່ານ!",
+      thanks2: " ໄດ້ຖືກບັນທຶກແລ້ວ.",
+      copyright: "Copyright (C) ແບບສຳຫຼວດພາສາ. ສິດທິທັງໝົດສະຫງວນໄວ້.",
+      recommended: "★ ຄຳແນະນຳ",
+      sending: "ກຳລັງສົ່ງ..."
+    },
+    zh: {
+      label: "中文",
+      title: "★ 语言调查表 ★",
+      subtitle: "- 感谢您的参与 -",
+      autonote: "显示语言根据浏览器设置自动选择／可随时更改",
+      notice: "感谢您访问本调查表。<br>请选择您用于阅读的一种语言。结果将用于改善网站。",
+      question: "问：您使用什么语言阅读？",
+      detect: "※ 根据您的浏览器设置，我们用",
+      detect2: "标记了推荐选项",
+      showmore: "显示更多语言",
+      showless: "显示更少语言",
+      allcount: "共 ",
+      langunit: " 种语言",
+      thanks1: "感谢您的回答！",
+      thanks2: " 已被记录。",
+      copyright: "Copyright (C) 语言调查表。保留所有权利。",
+      recommended: "★ 推荐",
+      sending: "正在发送..."
+    },
+    ko: {
+      label: "한국어",
+      title: "★ 언어 설문조사 양식 ★",
+      subtitle: "- 참여해 주셔서 감사합니다 -",
+      autonote: "표시 언어는 브라우저 설정에서 자동 선택되며 언제든지 변경할 수 있습니다",
+      notice: "이 설문조사 양식을 방문해 주셔서 감사합니다.<br>읽는 데 사용하는 언어를 하나 선택해 주세요. 결과는 사이트 개선에 사용됩니다.",
+      question: "질문: 읽는 데 어떤 언어를 사용하십니까?",
+      detect: "※ 브라우저 설정에 따라 추천 항목을",
+      detect2: "로 표시했습니다",
+      showmore: "언어 더 보기",
+      showless: "언어 적게 보기",
+      allcount: "전체 ",
+      langunit: "개 언어",
+      thanks1: "응답해 주셔서 감사합니다!",
+      thanks2: "(으)로 기록되었습니다.",
+      copyright: "Copyright (C) 언어 설문조사 양식. All Rights Reserved.",
+      recommended: "★ 추천",
+      sending: "전송 중..."
+    }
+  };
+
+  const UI_LANG_ORDER = ["en","ja","pt","vi","th","id","ms","tl","km","my","lo","zh","ko"];
+
+  // セレクトボックスを生成
+  const uiSelect = document.getElementById("ui-lang-select");
+  UI_LANG_ORDER.forEach(code => {
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = UI_TEXT[code].label;
+    uiSelect.appendChild(opt);
+  });
+
+  // --- UI言語の自動判定: ブラウザの navigator.language(s) のみを使用（IPは使用しない） ---
+  function detectUiLang() {
+    const navLangs = navigator.languages || [navigator.language || "en"];
+    for (const nl of navLangs) {
+      const short = nl.toLowerCase().split("-")[0];
+      if (UI_TEXT[short]) return short;
+      // pt-br等の地域別コードにも対応
+      const full = nl.toLowerCase();
+      const matchFull = UI_LANG_ORDER.find(c => c === full);
+      if (matchFull) return matchFull;
+    }
+    return "en";
+  }
+
+  let uiLang = detectUiLang();
+  uiSelect.value = uiLang;
+
+  function applyUiLang(lang) {
+    uiLang = lang;
+    const t = UI_TEXT[lang];
+    document.getElementById("t-title").textContent = t.title;
+    document.getElementById("t-subtitle").textContent = t.subtitle;
+    document.getElementById("t-autonote").textContent = t.autonote;
+    document.getElementById("t-notice").innerHTML = t.notice;
+    document.getElementById("t-question").textContent = t.question;
+    document.getElementById("t-detect").textContent = t.detect;
+    document.getElementById("t-detect2").textContent = t.detect2;
+    document.getElementById("t-allcount").textContent = t.allcount;
+    document.getElementById("t-langunit").textContent = t.langunit;
+    document.getElementById("t-thanks1").textContent = t.thanks1;
+    document.getElementById("t-thanks2").textContent = t.thanks2;
+    document.getElementById("t-copyright").textContent = t.copyright;
+    document.getElementById("t-showmore").textContent = showingAll ? t.showless : t.showmore;
+
+    renderGrid(); // バッジ文言(おすすめ等)もlang依存のため再描画
+  }
+
+  uiSelect.addEventListener("change", (e) => applyUiLang(e.target.value));
+
+  // --- アンケート回答候補の自動検出（推奨マーク用、並び順は固定） ---
+  function detectPreferredAnswerCode() {
+    const navLangs = navigator.languages || [navigator.language || "en"];
+    for (const nl of navLangs) {
+      const short = nl.toLowerCase().split("-")[0];
+      const found = LANGS.find(l => l.code === short || l.code.split("-")[0] === short);
+      if (found) return found.code;
+    }
+    return "en";
+  }
+
+  const recommendedCode = detectPreferredAnswerCode();
+  document.getElementById("total-count").textContent = LANGS.length;
+
+  const grid = document.getElementById("lang-grid");
+  let showingAll = false;
+  const INITIAL_SHOW = 8;
+
+  function renderGrid() {
+    grid.innerHTML = "";
+    // 表示順は固定（英語→日本語→ポルトガル語系→東南アジア→その他）。並び替えは行わない。
+    const list = showingAll ? LANGS : LANGS.slice(0, INITIAL_SHOW);
+    const t = UI_TEXT[uiLang];
+
+    list.forEach(lang => {
+      const btn = document.createElement("div");
+      btn.className = "lang-btn" + (lang.code === recommendedCode ? " recommended" : "");
+      btn.innerHTML =
+        '<span><span class="native">' + lang.native + '</span>' +
+        '<span class="code">' + lang.en + '</span></span>' +
+        (lang.code === recommendedCode ? '<span class="badge">' + t.recommended + '</span>' : '');
+      btn.addEventListener("click", () => selectLanguage(lang));
+      grid.appendChild(btn);
+    });
+  }
+
+  document.getElementById("show-all-link").addEventListener("click", () => {
+    showingAll = !showingAll;
+    document.getElementById("t-showmore").textContent = showingAll ? UI_TEXT[uiLang].showless : UI_TEXT[uiLang].showmore;
+    renderGrid();
+  });
+
+  function selectLanguage(lang) {
+    document.getElementById("status-line").textContent = UI_TEXT[uiLang].sending;
+
+    const payload = {
+      content: "📊 言語アンケート回答：**" + lang.native + "** (" + lang.en + " / " + lang.code + ")"
+    };
+
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+      .then(() => onSubmitDone(lang))
+      .catch(() => onSubmitDone(lang)); // 送信失敗時もユーザー体験は阻害しない
+  }
+
+  function onSubmitDone(lang) {
+    document.getElementById("status-line").textContent = "";
+    document.getElementById("content").querySelectorAll("#question, #detect-info, #lang-grid, #manual-toggle").forEach(el => {
+      el.style.display = "none";
+    });
+    document.getElementById("thanks-lang").textContent = lang.native + " (" + lang.en + ")";
+    document.getElementById("thanks").style.display = "block";
+  }
+
+  // 初期表示をUI言語に合わせて反映
+  applyUiLang(uiLang);
+</script>
+
+</body>
+</html>
